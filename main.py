@@ -24,7 +24,7 @@ GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN", "")
 OPENAI_API_KEY = os.environ["OPENAI_API_KEY"]
 DISCORD_WEBHOOK_URL = os.environ["DISCORD_WEBHOOK_URL"]
 
-OPENAI_MODEL = os.environ.get("OPENAI_MODEL", "gpt-4o-mini")
+OPENAI_MODEL = os.environ.get("OPENAI_MODEL", "gpt-5.4-mini")
 TOP_N = int(os.environ.get("TOP_N", "10"))
 
 # LLM / AI Agent 相關關鍵字（GitHub topic + 關鍵字 OR）
@@ -51,13 +51,7 @@ def search_trending_repos(top_n: int = 10) -> list[dict[str, Any]]:
     """
     one_month_ago = (dt.date.today() - dt.timedelta(days=30)).isoformat()
 
-    # 用 topic OR 組合避免單一關鍵字遺漏
-    topic_query = " ".join(f"topic:{kw}" for kw in SEARCH_KEYWORDS[:3])
-    # GitHub 不支援 topic OR，改用 in:topics + 關鍵字
-    keyword_query = " OR ".join(SEARCH_KEYWORDS)
-
-    query = f"({keyword_query}) in:name,description,topics pushed:>={one_month_ago}"
-
+    query = f"llm agent in:name,description,topics pushed:>={one_month_ago}"
     url = "https://api.github.com/search/repositories"
     headers = {
         "Accept": "application/vnd.github+json",
