@@ -1,0 +1,18 @@
+# 環境變數（含 API 金鑰，禁止上傳）
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+env/
+
+# 產生的報告
+reports/
+
+# IDE
+.vscode/
+.idea/
+*.swp
