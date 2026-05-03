@@ -65,15 +65,6 @@ llm-trend-radar/
 └── README.md
 ```
 
-## 💰 成本估算
-
-以 `gpt-4o-mini` + Top 10 估算：
-- 每次執行約消耗 30k~50k tokens（README + 摘要）
-- 每週成本約 **$0.01 ~ $0.03 USD**
-- 一年大約 **$1 USD 左右**
-
-換成 `gpt-4o` 大約貴 15~20 倍，仍在合理範圍。
-
 ## 🔧 客製化方向
 
 - **改通知管道**：把 `send_to_discord()` 換成 Slack / Telegram / Email
