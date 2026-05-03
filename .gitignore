@@ -11,8 +11,11 @@ env/
 
 # 產生的報告
 reports/
-
+.Rhistory
+summarize.md
 # IDE
 .vscode/
 .idea/
 *.swp
+
+weekly.yml
