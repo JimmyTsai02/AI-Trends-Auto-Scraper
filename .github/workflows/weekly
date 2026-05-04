@@ -1,0 +1,85 @@
+name: Weekly LLM Trend Radar
+
+on:
+  schedule:
+    # Every Monday 14:00 Taiwan time = Monday 06:00 UTC
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  run-radar:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Debug repository files
+        run: |
+          echo "Current directory:"
+          pwd
+          echo "Repository files:"
+          ls -la
+          echo "Workflow files:"
+          find .github/workflows -maxdepth 2 -type f -print || true
+          echo "Project files:"
+          find . -maxdepth 2 -type f -print
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Prepare output folders
+        run: |
+          mkdir -p reports data
+
+      - name: Check environment variables
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          OPENAI_MODEL: gpt-4o-mini
+          TOP_N: "10"
+        run: |
+          test -n "$GITHUB_TOKEN" && echo "GITHUB_TOKEN exists" || echo "GITHUB_TOKEN missing"
+          test -n "$OPENAI_API_KEY" && echo "OPENAI_API_KEY exists" || echo "OPENAI_API_KEY missing"
+          test -n "$DISCORD_WEBHOOK_URL" && echo "DISCORD_WEBHOOK_URL exists" || echo "DISCORD_WEBHOOK_URL missing"
+          echo "OPENAI_MODEL=$OPENAI_MODEL"
+          echo "TOP_N=$TOP_N"
+
+      - name: Run trend radar
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          OPENAI_MODEL: gpt-4o-mini
+          TOP_N: "10"
+        run: |
+          python -u main.py
+
+      - name: Commit report
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add reports/ data/ || true
+
+          if ! git diff --cached --quiet; then
+            git commit -m "chore: weekly trend report $(date +%Y-%m-%d)"
+            git push
+          else
+            echo "No new report to commit"
+          fi
