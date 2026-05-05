@@ -25,7 +25,7 @@ OPENAI_API_KEY = os.environ["OPENAI_API_KEY"]
 DISCORD_WEBHOOK_URL = os.environ["DISCORD_WEBHOOK_URL"]
 
 OPENAI_MODEL = os.environ.get("OPENAI_MODEL", "gpt-5.4-mini")
-TOP_N = int(os.environ.get("TOP_N", "10"))
+TOP_N = int(os.environ.get("TOP_N", "3"))
 
 # LLM / AI Agent 相關關鍵字（GitHub topic + 關鍵字 OR）
 SEARCH_KEYWORDS = [
@@ -49,9 +49,9 @@ def search_trending_repos(top_n: int = 10) -> list[dict[str, Any]]:
     GitHub Search API 的策略：用 `pushed:>=YYYY-MM-DD` + `topic:` 關鍵字組合，
     再以 stars 降序排序，取前 N 名。
     """
-    one_month_ago = (dt.date.today() - dt.timedelta(days=30)).isoformat()
+    three_months_ago = (dt.date.today() - dt.timedelta(days=90)).isoformat()
 
-    query = f"llm agent in:name,description,topics pushed:>={one_month_ago}"
+    query = f"llm agent in:name,description,topics created:>={three_months_ago} stars:>10"
     url = "https://api.github.com/search/repositories"
     headers = {
         "Accept": "application/vnd.github+json",
